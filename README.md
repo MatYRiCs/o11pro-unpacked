@@ -9,6 +9,7 @@
 | Document | Description |
 |----------|-------------|
 | [API.md](docs/API.md) | Complete REST API reference all endpoints, methods, and auth details |
+| [WSL.md](docs/WSL.md) | Complete WSL setup guide |
 | [RE.md](docs/RE.md) | Reverse engineering notes frontend deobfuscation analysis, Vue component map, config schema, and TODO
 
 ---
