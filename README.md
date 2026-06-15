@@ -1,13 +1,13 @@
 # O11 Pro Cracked - Unpacked Version
 
 **O11 Pro** is a streaming media server capable of proxying, remuxing, and redistributing IPTV/OTT live and VOD streams. It features a built-in web UI, EPG support, HLS/DASH handling, and DRM decryption via CDM integration.
-
 ---
 
 ## Further Reading
 
 | Document | Description |
 |----------|-------------|
+| [DISCLAIMER.md](DISCLAIMER/API.md) | To avoid misunderstandings, here are some things to know about this release. |
 | [API.md](docs/API.md) | Complete REST API reference all endpoints, methods, and auth details |
 | [WSL.md](docs/WSL.md) | Complete WSL setup guide |
 | [RE.md](docs/RE.md) | Reverse engineering notes frontend deobfuscation analysis, Vue component map, config schema, and TODO
