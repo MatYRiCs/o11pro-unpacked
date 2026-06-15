@@ -4,19 +4,6 @@
 
 ---
 
-## Tech Stack
-
-| Layer | Technology | Details |
-|-------|-----------|---------|
-| **Backend** | **Golang** (Go) | ELF64 binary, CGo-linked (`libc`, `libpthread`, `libresolv`), statically compiled runtime with dynamic libc linking |
-| **Frontend** | **Vue.js 3** | Composition API, `<script setup>` SFCs, Pinia state management, Vue Router |
-| **HTTP Client** | **Axios** | API requests, JWT token auth |
-| **Video Player** | **HLS.js** | In-browser HLS stream playback |
-| **CSS** | **Tailwind CSS** | Utility-first classes throughout (`flex`, `gap-4`, `capitalize`, etc.) |
-| **Obfuscation** | **obfuscator.io** | String array rotation + base64 + RC4 cipher, `o11_0x3b01` decoder function with 6,922 encoded strings |
-
----
-
 ## Quick Start
 
 ```bash
