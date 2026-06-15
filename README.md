@@ -8,10 +8,10 @@
 
 | Document                           | Description                                                                                             |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [DISCLAIMER.md](DISCLAIMER/API.md) | To avoid misunderstandings, here are some things to know about this release                             |
-| [API.md](docs/API.md)              | Complete REST API reference: endpoints, methods, and authentication details                             |
-| [WSL.md](docs/WSL.md)              | Complete WSL setup guide                                                                                |
-| [RE.md](docs/RE.md)                | Reverse engineering notes: frontend deobfuscation analysis, Vue component map, config schema, and TODOs |
+| [DISCLAIMER](docs/DISCLAIMER.MD) | To avoid misunderstandings, here are some things to know about this release                             |
+| [API](docs/API.md)              | Complete REST API reference: endpoints, methods, and authentication details                             |
+| [WSL](docs/WSL.md)              | Complete WSL setup guide                                                                                |
+| [RE](docs/RE.md)                | Reverse engineering notes: frontend deobfuscation analysis, Vue component map, config schema, and TODOs |
 
 ---
 
