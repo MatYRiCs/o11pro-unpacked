@@ -1,0 +1,10 @@
+certifi
+cloudscraper
+curl-cffi
+dnspython
+PySocks
+python-dateutil
+requests
+requests-toolbelt
+urllib3
+deep-translator
