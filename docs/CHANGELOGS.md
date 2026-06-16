@@ -28,10 +28,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- DES-CBC cipher suite name can no longer be resolved — cipher instantiation by name lookup will fail safely.
-- DRM decryption keys are no longer written to log files — key material is redacted as `key=REDA`.
-- Python HTTP client no longer follows redirects automatically — open redirect attacks blocked.
-- DNS resolver no longer hardcoded to single provider — switched to privacy-focused Quad9.
+- DES-CBC cipher suite name can no longer be resolved cipher instantiation by name lookup will fail safely.
+- DRM decryption keys are no longer written to log files key material is redacted as `key=REDA`.
+- Python HTTP client no longer follows redirects automatically open redirect attacks blocked.
+- DNS resolver no longer hardcoded to single provider switched to privacy-focused Quad9.
 
 ### Verified (Runtime Tests)
 
@@ -45,7 +45,7 @@ All 11 end-to-end runtime tests passed on the patched binary (started with `-jwt
 | 4 | `alg=none` JWT attack | PASS (403 Forbidden) |
 | 5 | Forged token (old JWT secret) | PASS (403 Forbidden) |
 | 6 | No auth token | PASS (403 Forbidden) |
-| 7 | `Bearer` prefix token | WARNING (403 — known source-level limitation, requires RFC 6750 support) |
+| 7 | `Bearer` prefix token | WARNING (403 known source-level limitation, requires RFC 6750 support) |
 | 8 | Path traversal `/static/../../../etc/passwd` (no auth) | PASS (no /etc/passwd leak) |
 | 9 | Path traversal `/static/../../../etc/passwd` (with auth) | PASS (returns HTML, not /etc/passwd) |
 | 10 | Path traversal variants (`..%2f`, `....//`) | PASS (all blocked) |
@@ -66,7 +66,7 @@ Binary patch verification (34/34 checks, 100% pass rate):
 | File integrity | 1 | 1 |
 | Anti-pattern verification (9 old values) | 9 | 9 |
 
-**Note**: Login with the auto-generated temporary password returns 401 — a pre-existing condition unrelated to applied patches. Use `-jwtsecret <secret>` with manual user accounts in `o11.cfg`, or the `-allow <cidr>` flag for local admin access.
+**Note**: Login with the auto-generated temporary password returns 401 a pre-existing condition unrelated to applied patches. Use `-jwtsecret <secret>` with manual user accounts in `o11.cfg`, or the `-allow <cidr>` flag for local admin access.
 
 ### Deployment Hardening (Runtime Mitigations)
 
@@ -83,47 +83,47 @@ The following mitigations should be applied at deployment via command-line flags
 The following 22 vulnerabilities were identified across three scan passes but cannot be patched at the binary level. They require Go/Python source modifications and recompilation.
 
 **Critical (2):**
-- **Missing PIE** — ELF type is `EXEC` (not `DYN`), disabling ASLR for the code segment. ROP gadget addresses are predictable. Requires recompilation with `-buildmode=pie`.
-- **Missing Stack Canary** — No `__stack_chk_fail` symbol; stack buffer overflows are undetected. Requires recompilation with `-fstack-protector-strong`.
-- **Constant IV in Encryption** — `constantIvSize` protobuf field indicates DRM encryption uses non-random IVs, producing identical ciphertext for identical plaintexts. Requires code change to use `crypto/rand.Read()` for IV generation.
-- **DRM Key Logging (partial)** — While the format string is redacted, the underlying log call still executes. A determined attacker with debug logging enabled may still observe key material through other code paths. Requires removing key logging statements at source level.
+- **Missing PIE** ELF type is `EXEC` (not `DYN`), disabling ASLR for the code segment. ROP gadget addresses are predictable. Requires recompilation with `-buildmode=pie`.
+- **Missing Stack Canary** No `__stack_chk_fail` symbol; stack buffer overflows are undetected. Requires recompilation with `-fstack-protector-strong`.
+- **Constant IV in Encryption** `constantIvSize` protobuf field indicates DRM encryption uses non-random IVs, producing identical ciphertext for identical plaintexts. Requires code change to use `crypto/rand.Read()` for IV generation.
+- **DRM Key Logging (partial)** While the format string is redacted, the underlying log call still executes. A determined attacker with debug logging enabled may still observe key material through other code paths. Requires removing key logging statements at source level.
 
 **High (8):**
-- **Partial RELRO** — No `BIND_NOW` flag; GOT entries writable for lazy-bound functions. Recompile with `-Wl,-z,relro,-z,now`.
-- **Timing Attack** — No `subtle.ConstantTimeCompare` or `hmac.Equal` found; JWT/password comparison leaks timing. Replace `==` with constant-time comparison.
-- **SSRF via Internal URLs** — `http://master_hls/mp4/offair/` + user-controllable `SourceURL`/`manifestUrl`. Implement URL allowlisting.
-- **Command Injection via FFmpeg** — `os/exec` + FFmpeg args with user-controlled stream URLs. Sanitize all user input before command construction.
-- **JWT Algorithm Confusion** — HS256/384/512 supported alongside RS256 with hardcoded secret. Restrict accepted algorithms via `jwt.WithSigningMethod()`.
-- **Python Path Injection** — `authFile = '/example_' + user + '.tokens'` allows `../` traversal. Sanitize username input.
-- **Python Credential Leakage** — Passwords sent to user-specified URL; visible in `/proc/*/cmdline`. Use environment variables or stdin for credentials.
-- **Unrestricted File Upload** — `ParseMultipartForm`/`FormFile` without MIME type or extension validation. Implement allowlisting.
-- **No Rate Limiting** — Login and API endpoints have no throttling. Implement `golang.org/x/time/rate` middleware.
-- **Insecure Cookies** — Python Cookies class lacks `HttpOnly`, `Secure`, `SameSite` attributes. Add security flags.
-- **CGO Privilege Escalation** — `setuid`/`setgid`/`setgroups` functions present; incorrect order may allow re-escalation. Audit privilege dropping sequence.
-- **Zip/Tar Path Traversal** — `tarinsecurepath`/`zipinsecurepath` error strings indicate archive extraction path validation. Go 1.20+ handles this, but custom extraction code may not.
+- **Partial RELRO** No `BIND_NOW` flag; GOT entries writable for lazy-bound functions. Recompile with `-Wl,-z,relro,-z,now`.
+- **Timing Attack** No `subtle.ConstantTimeCompare` or `hmac.Equal` found; JWT/password comparison leaks timing. Replace `==` with constant-time comparison.
+- **SSRF via Internal URLs** `http://master_hls/mp4/offair/` + user-controllable `SourceURL`/`manifestUrl`. Implement URL allowlisting.
+- **Command Injection via FFmpeg** `os/exec` + FFmpeg args with user-controlled stream URLs. Sanitize all user input before command construction.
+- **JWT Algorithm Confusion** HS256/384/512 supported alongside RS256 with hardcoded secret. Restrict accepted algorithms via `jwt.WithSigningMethod()`.
+- **Python Path Injection** `authFile = '/example_' + user + '.tokens'` allows `../` traversal. Sanitize username input.
+- **Python Credential Leakage** Passwords sent to user-specified URL; visible in `/proc/*/cmdline`. Use environment variables or stdin for credentials.
+- **Unrestricted File Upload** `ParseMultipartForm`/`FormFile` without MIME type or extension validation. Implement allowlisting.
+- **No Rate Limiting** Login and API endpoints have no throttling. Implement `golang.org/x/time/rate` middleware.
+- **Insecure Cookies** Python Cookies class lacks `HttpOnly`, `Secure`, `SameSite` attributes. Add security flags.
+- **CGO Privilege Escalation** `setuid`/`setgid`/`setgroups` functions present; incorrect order may allow re-escalation. Audit privilege dropping sequence.
+- **Zip/Tar Path Traversal** `tarinsecurepath`/`zipinsecurepath` error strings indicate archive extraction path validation. Go 1.20+ handles this, but custom extraction code may not.
 
 **Medium (9):**
-- **Missing Security Headers** — No `X-Frame-Options`, `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`.
-- **CORS Wildcard** — `Access-Control-Allow-Origin: *` with `Access-Control-Allow-Credentials` risk.
-- **WebSocket No Origin Check** — No `CheckOrigin` function; cross-site WebSocket hijacking possible.
-- **XSS via innerHTML** — Vue.js logs component uses `innerHTML` (11 instances); stored XSS if logs contain user data.
-- **Prototype Pollution (JS)** — `__proto__` in 14 JS locations with deep merge operations.
-- **postMessage Wildcard** — `postMessage(n,"*")` without origin validation.
-- **Race Conditions** — `concurrent map writes` runtime errors indicate unsynchronized shared state.
-- **AES-CTR 64-bit Counter** — HLS.js uses 64-bit counter (should be 128); weakened encryption margin.
-- **Python DNS Monkey-Patch** — Global `connection.create_connection` override; DNS rebinding risk.
-- **MySQL Format String** — `mysql0:256%d:%d%s:%d` pattern may indicate SQL injection risk.
-- **CGO Boundary** — `C.GoString` without explicit length; potential use-after-free or buffer overread.
-- **Verbose Error Messages** — Login errors leak usernames and IPs (e.g., `login failed for [admin/127.0.0.1]`).
+- **Missing Security Headers** No `X-Frame-Options`, `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`.
+- **CORS Wildcard** `Access-Control-Allow-Origin: *` with `Access-Control-Allow-Credentials` risk.
+- **WebSocket No Origin Check** No `CheckOrigin` function; cross-site WebSocket hijacking possible.
+- **XSS via innerHTML** Vue.js logs component uses `innerHTML` (11 instances); stored XSS if logs contain user data.
+- **Prototype Pollution (JS)** `__proto__` in 14 JS locations with deep merge operations.
+- **postMessage Wildcard** `postMessage(n,"*")` without origin validation.
+- **Race Conditions** `concurrent map writes` runtime errors indicate unsynchronized shared state.
+- **AES-CTR 64-bit Counter** HLS.js uses 64-bit counter (should be 128); weakened encryption margin.
+- **Python DNS Monkey-Patch** Global `connection.create_connection` override; DNS rebinding risk.
+- **MySQL Format String** `mysql0:256%d:%d%s:%d` pattern may indicate SQL injection risk.
+- **CGO Boundary** `C.GoString` without explicit length; potential use-after-free or buffer overread.
+- **Verbose Error Messages** Login errors leak usernames and IPs (e.g., `login failed for [admin/127.0.0.1]`).
 
 **Low (3):**
-- **Flowbite Tooltip XSS** — `innerHTML` in CopyClipboard component.
-- **HLS Key URL Predictable** — `skd://hlskey` DRM key URL pattern.
-- **Python TLS 1.2 Forced Max** — Disables TLS 1.3, losing forward secrecy and 0-RTT.
-- **Hardcoded localhost:1999** — Internal service endpoint in JS demo code.
+- **Flowbite Tooltip XSS** `innerHTML` in CopyClipboard component.
+- **HLS Key URL Predictable** `skd://hlskey` DRM key URL pattern.
+- **Python TLS 1.2 Forced Max** Disables TLS 1.3, losing forward secrecy and 0-RTT.
+- **Hardcoded localhost:1999** Internal service endpoint in JS demo code.
 
 **Info (1):**
-- **Go Version Unknown** — Stripped buildinfo; unknown patch level for Go 1.22.x CVEs (CVE-2024-24790, CVE-2024-34156, CVE-2024-34158).
+- **Go Version Unknown** Stripped buildinfo; unknown patch level for Go 1.22.x CVEs (CVE-2024-24790, CVE-2024-34156, CVE-2024-34158).
 
 ---
 
@@ -150,7 +150,7 @@ The following 22 vulnerabilities were identified across three scan passes but ca
 ### Fixed
 
 - Path traversal via `%s/..%s` format string no longer allows `../` directory escape from `/static` or `/hls/rec/` paths.
-- Old JWT secret fragment `H0oFApb6e` is no longer present in the binary — information disclosure vector eliminated.
+- Old JWT secret fragment `H0oFApb6e` is no longer present in the binary information disclosure vector eliminated.
 
 ### Verified (Runtime Tests)
 
@@ -166,11 +166,11 @@ All 13 end-to-end tests passed on the patched binary:
 | 6 | No auth token | PASS (Unauthorized) |
 | 7 | Path traversal without auth | PASS (401) |
 | 8 | Valid token API access | PASS (200, server info returned) |
-| 9 | `Bearer` prefix token | PASS (Unauthorized — known limitation) |
+| 9 | `Bearer` prefix token | PASS (Unauthorized known limitation) |
 | 10 | `?token=` query parameter | PASS (auth accepted) |
-| 11 | Path traversal with auth | PASS (404 — traversal neutralized) |
-| 12 | Static file access | PASS (401 — requires auth) |
-| 13 | `-allow` CIDR bypass | PASS (confirmed bypass works — operator risk) |
+| 11 | Path traversal with auth | PASS (404 traversal neutralized) |
+| 12 | Static file access | PASS (401 requires auth) |
+| 13 | `-allow` CIDR bypass | PASS (confirmed bypass works operator risk) |
 
 ### Updated Open Issues (Source-Level Fixes Required)
 
@@ -189,8 +189,8 @@ See [1.3.0] for the complete and up-to-date categorized list of all open issues.
 
 - **[Critical]** Replaced hardcoded JWT signing secret (`H0oFApb6e…mLoR` → `Xk9QmW7r…VqYZ`). The original 54-character secret was embedded in Go type metadata at offset `0x156a902`, allowing any attacker to forge valid admin tokens. Tokens signed with the old secret are now **rejected** by the server.
 - **[Critical]** Renamed `SkipAllAuthorities` → `XkipAllAuthorities` and `SkipAuthority` → `XkipAuthority` in the `dbp0REtqY` DNS/TLS transport package. The `SkipAllAuthorities` method disabled peer certificate verification on outbound TLS connections, enabling MITM attacks on all upstream provider/CDN traffic.
-- **[High]** Verified JWT `alg=none` attack is rejected — Go `golang-jwt` v4+ does not register a `SigningMethodNone`; the library returns "unexpected signing method" for any non-registered algorithm.
-- **[High]** Documented `-allow` CIDR bypass risk — the flag accepts CIDR ranges for no-auth admin access. Default is empty (safe), but operators should verify no overly permissive ranges are configured.
+- **[High]** Verified JWT `alg=none` attack is rejected Go `golang-jwt` v4+ does not register a `SigningMethodNone`; the library returns "unexpected signing method" for any non-registered algorithm.
+- **[High]** Documented `-allow` CIDR bypass risk the flag accepts CIDR ranges for no-auth admin access. Default is empty (safe), but operators should verify no overly permissive ranges are configured.
 
 ### Changed
 
@@ -201,7 +201,7 @@ See [1.3.0] for the complete and up-to-date categorized list of all open issues.
 ### Fixed
 
 - Forged tokens signed with the original hardcoded secret are now rejected (401 Unauthorized).
-- `SkipAllAuthorities` can no longer be resolved by name — reflection-based invocation will fail, preventing TLS verification bypass.
+- `SkipAllAuthorities` can no longer be resolved by name reflection-based invocation will fail, preventing TLS verification bypass.
 - `alg=none` JWT tokens are rejected by the server (confirmed via e2e test).
 
 ---
@@ -221,7 +221,7 @@ See [1.3.0] for the complete and up-to-date categorized list of all open issues.
 - **[Critical]** Disabled TLS 1.0 server support (`tls10server=1 → 0`). TLS 1.0 is deprecated by RFC 8996 and vulnerable to POODLE/BEAST downgrade attacks.
 - **[Critical]** Disabled 3DES cipher suites (`tls3des=1 → 0`). 3DES is vulnerable to SWEET32 and deprecated by NIST/IETF.
 - **[Critical]** Enabled SSL certificate verification on all outbound API requests (`verify=False → verify=True` across 7 Python client calls). All requests were previously vulnerable to MITM interception.
-- **[High]** Disabled RSA key exchange (`tlsrsakex=1 → 0`). RSA KEX provides no forward secrecy — private key compromise decrypts all past sessions. Only ECDHE suites are now negotiated.
+- **[High]** Disabled RSA key exchange (`tlsrsakex=1 → 0`). RSA KEX provides no forward secrecy private key compromise decrypts all past sessions. Only ECDHE suites are now negotiated.
 - **[High]** Required Extended Master Secret (`tlsunsafeekm=1 → 0`). Without EMS (RFC 7627), sessions are vulnerable to triple-handshake attacks.
 - **[High]** Disabled MD5-RSA signature algorithm (`MD5-RSA → MD6-RSA`). MD5 is cryptographically broken; the renamed algorithm causes verification to fail, forcing SHA-256+ signatures.
 - **[Medium]** Renamed predictable temp file path (`/rec/tmp.txt → /rec/tmp.sec`) to reduce symlink/race-condition attack surface.

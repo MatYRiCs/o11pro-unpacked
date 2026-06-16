@@ -6,7 +6,7 @@ The web UI JavaScript (`resources/index-BX-yLeHZ.js`) is obfuscated using **obfu
 
 ### Obfuscation Method
 - **String Array**: 6,922 encoded strings stored in `o11_0xf6cf()` array
-- **Decoder Function**: `o11_0x3b01(index)` — performs base64 decode followed by RC4 decryption
+- **Decoder Function**: `o11_0x3b01(index)` performs base64 decode followed by RC4 decryption
 - **Control Flow Flattening**: All string references replaced with `o11_0x3b01(0xHEX)` calls
 - **Dead Code Injection**: Anti-debug traps with `debugger` statements and `parseInt` chains
 - **Self-Defending**: Checksum validation that crashes if the code is modified
@@ -109,7 +109,7 @@ The web UI JavaScript (`resources/index-BX-yLeHZ.js`) is obfuscated using **obfu
 
 ## TODO
 
-- [ ] Full deobfuscation of `resources/index-BX-yLeHZ.js` — replace all `o11_0x3b01(0xHEX)` calls with decoded string literals for readability
+- [ ] Full deobfuscation of `resources/index-BX-yLeHZ.js` replace all `o11_0x3b01(0xHEX)` calls with decoded string literals for readability
 - [ ] Reconstruct Vue SFC components from the flattened render functions
 - [ ] Map all API endpoint handlers to their backend Go functions
 - [ ] Reverse engineer the Go backend API handler routing logic
