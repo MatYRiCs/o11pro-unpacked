@@ -10,13 +10,13 @@
 #   ./RunMe.sh 8080 4             # custom port + verbose=4
 #   GOMEMLIMIT=4G ./RunMe.sh      # override memory limit
 #   MAX_STREAMS=8 ./RunMe.sh      # limit concurrent streams
-#   MONITOR=false ./RunMe.sh      # disable security monitor
+#   MONITOR=true ./RunMe.sh      # enable security monitor
 #   HLS_PROXY=false ./RunMe.sh    # disable HLS proxy
 
 set -euo pipefail
 
 # ─── Config Defaults ───────────────────────────────────────────────────
-MONITOR="${MONITOR:-true}"
+MONITOR="${MONITOR:-false}"
 MONITOR_PORT="${MONITOR_PORT:-1339}"
 
 HLS_PROXY="${HLS_PROXY:-true}"
@@ -39,7 +39,7 @@ ADMIN_PASS="${ADMIN_PASS:-admin1337}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 VENV_DIR="$SCRIPT_DIR/venv"
-HLS_PROXY_CONFIG="${HLS_PROXY_CONFIG:-$PROJECT_ROOT/cache/orig_urls.json}"
+HLS_PROXY_CONFIG="${HLS_PROXY_CONFIG:-$SCRIPT_DIR/cache/orig_urls.json}"
 
 export PATH="$VENV_DIR/bin:/usr/bin:/bin:/usr/local/bin:${PATH:-}"
 cd "$SCRIPT_DIR"
@@ -76,7 +76,7 @@ mkdir -p hls/live keys epg dl manifests offair overlay logos fonts \
          rec scripts logs providers cache
 
 # ─── Build Args ────────────────────────────────────────────────────────
-ARGS="-c o11.cfg -p $PORT -b $BIND -stdout -v $VERBOSE"
+ARGS="-c o11.cfg -p $PORT -b $BIND -stdout -v $VERBOSE -providers providers -usecdm"
 
 if [ "$KEEP_FALSE" = "true" ]; then
   ARGS="$ARGS -keep=false"
@@ -164,7 +164,7 @@ if [ "$HLS_PROXY" = "true" ]; then
   else
     if [ -f "modules/generate_orig_urls.py" ]; then
       python3 modules/generate_orig_urls.py \
-        --dir "$PROJECT_ROOT/providers" \
+        --dir "$SCRIPT_DIR/providers" \
         --output "$HLS_PROXY_CONFIG" 2>/dev/null || true
     fi
 

@@ -20,7 +20,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from concurrent.futures import ThreadPoolExecutor
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'cache', 'orig_urls.json')
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cache', 'orig_urls.json')
 PROXY_PORT = 9999
 PROXY_BIND = '127.0.0.1'
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
