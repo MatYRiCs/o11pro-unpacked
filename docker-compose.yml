@@ -1,0 +1,53 @@
+# Quick start: docker compose up -d --build
+# The image clones the upstream repo at build time. See UPSTREAM_REF below to pin a tag/commit.
+services:
+  o11pro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pin the upstream branch/tag/commit to clone. Default is main.
+        - UPSTREAM_REF=main
+    container_name: o11pro
+    restart: unless-stopped
+    init: true
+    ports:
+      # 1337 = o11pro web UI/API
+      # 1338 = HLS proxy
+      # 1339 = security monitor
+      - "1337:1337"
+      - "1338:1338"
+      - "1339:1339"
+    environment:
+      # Change ADMIN_USER and ADMIN_PASS before exposing to a network.
+      - PORT=1337
+      - BIND=0.0.0.0
+      - VERBOSE=2
+      - HLS_PROXY=true
+      - HLS_PROXY_PORT=1338
+      - HLS_PROXY_BIND=0.0.0.0
+      - MONITOR=true
+      - MONITOR_PORT=1339
+      - GOMEMLIMIT=2GiB
+      - GOGC=100
+      - TZ=UTC
+      - ADMIN_USER=admin
+      - ADMIN_PASS=admin1337
+      - HLS_PROXY_CONFIG=/app/data/cache/orig_urls.json
+    volumes:
+      # All persistent application data lands in ./data on the host.
+      - ./data:/app/data
+      # Transient stream data is kept in RAM.
+      - type: tmpfs
+        target: /app/data/hls
+        tmpfs:
+          size: 512M
+      - type: tmpfs
+        target: /app/data/dl
+        tmpfs:
+          size: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
